@@ -5,15 +5,17 @@ import Header from './Header'
 import Hero from './Hero'
 import Footer from './Footer'
 
-export const Homepage = () => {
+
+const Homepage = () => {
     return (
-        <div className=''>
-            {/* <KeystrokeBiometrics /> */}
+        <div>
             <div className='xl:px-44 lg:px-20 md:px-14 px-6'>
                 <Header />
                 <Hero />
+                {/* <KeystrokeBiometrics /> */}
             </div>
             <Footer />
         </div>
     )
 }
+export default Homepage

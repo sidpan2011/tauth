@@ -3,14 +3,22 @@ import Logo from './Logo'
 import { Button } from './ui/button'
 import { RainbowButtonDemo } from './ReuseableRainbowButton'
 import { Link, useNavigate } from 'react-router-dom'
+import { useAtom } from 'jotai'
+import { hydratedAuthAtom } from '../store/store'
 
 
 const Header = () => {
     const navigate = useNavigate()
+    const [auth] = useAtom(hydratedAuthAtom)
+    console.log(auth.isAuthenticated);
     const menus = [
         { title: "Docs", link: "/docs" },
         { title: "Pricing", link: "/pricing" }
     ]
+    const handleLogout = () => {
+        localStorage.removeItem('auth')
+        navigate('/')
+    }
     return (
         <header className='flex justify-between items-center py-4 sticky top-0 backdrop-blur-md bg-background/60 z-20'>
             <div className='flex items-center space-x-8'>
@@ -20,10 +28,10 @@ const Header = () => {
                         <Link to={menu.link} key={index}>
                             <Button
                                 key={index}
-                                onClick={() => navigate(menu.toLowerCase())} // onclick will take the user to the respective page
+                                onClick={() => navigate(menu.title.toLowerCase())} // onclick will take the user to the respective page
                                 size="sm"
                                 variant={"ghost"}
-                                className='text-neutral-400 font-medium tracking-tighter rounded-xl'>
+                                className='text-neutral-400 font-medium rounded-xl'>
                                 {menu.title}
                             </Button>
                         </Link>
@@ -31,7 +39,15 @@ const Header = () => {
                 </div>
             </div>
             <div className=''>
-                <RainbowButtonDemo text={"Get Started"} />
+                {!auth.isAuthenticated ? (
+                    <Link to={"/getting-started/auth"}>
+                        <RainbowButtonDemo text={"Get Started"} />
+                    </Link>)
+                    : (
+                        <Button size="sm" className="rounded-xl" onClick={handleLogout}>Log out</Button>
+                    )
+                }
+
             </div>
         </header>
 

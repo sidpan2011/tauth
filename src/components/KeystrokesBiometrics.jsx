@@ -1,8 +1,10 @@
 
 import { useState, useRef } from 'react'
-import { AlertCircle, CheckCircle, X } from 'lucide-react'
+import { AlertCircle } from 'lucide-react'
 import { Button } from './ui/button'
 import { calculateMetrics } from '../lib/methods/calculateMetrics'
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
+import { Input } from './ui/input'
 
 export default function KeystrokeBiometrics() {
     const [inputText, setInputText] = useState('')
@@ -10,7 +12,15 @@ export default function KeystrokeBiometrics() {
     const [error, setError] = useState('')
     const [keystrokeData, setKeystrokeData] = useState([])
     const inputRef = useRef(null)
-    const sampleText = "rock"
+    const GOOD_SAMPLE_TEXTS = [
+        "the quick brown fox jumps over",        // 26 chars
+        "typing this phrase to verify myself",    // 32 chars
+        "hello world how are you today friend",   // 33 chars
+        "please type this to confirm identity",   // 34 chars
+        "a simple phrase to show my typing style" // 36 chars
+    ];
+    const sampleText = GOOD_SAMPLE_TEXTS[Math.floor(Math.random() * GOOD_SAMPLE_TEXTS.length)]
+    console.log(sampleText);
 
     const handleStartRecording = () => {
         setIsRecording(true)
@@ -86,80 +96,74 @@ export default function KeystrokeBiometrics() {
         }
     }
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
-            <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="bg-white shadow rounded-lg p-6 mb-8">
-                    <div className="mb-4">
-                        {/* <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-medium text-gray-700">Progress</span>
-                            <span className="text-sm font-medium text-gray-700">{currentStep}/4</span>
-                        </div> */}
-                        {/* <div className="w-full bg-gray-200 rounded-full h-2.5">
-                            <div
-                                className="bg-primary h-2.5 rounded-full transition-all duration-300 ease-in-out"
-                                style={{ width: `${(currentStep / 4) * 100}%` }}
-                            ></div>
-                        </div> */}
-                    </div>
+        <div className="min-h-screen flex flex-col">
+            <main className="flex-grow container mx-auto  py-8">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Type the below text to update your keystroke biometrics</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        {/* Sample Text */}
+                        <p className="text-muted-foreground font-bold">"{sampleText}"</p>
 
-                    <h2 className="text-lg font-semibold text-gray-900 mb-2">Sample Text</h2>
-                    <p className="text-gray-600 mb-4">{sampleText}</p>
-
-                    <div className="relative mb-4">
-                        <input
-                            ref={inputRef}
-                            type="text"
-                            value={inputText}
-                            onChange={handleInputChange}
-                            onKeyDown={handleKeyDown}
-                            onKeyUp={handleKeyUp}
-                            disabled={!isRecording}
-                            className="w-full p-3 border border-gray-300 rounded-md focus:ring-primary focus:border-primary transition duration-200"
-                            placeholder="Type the sample text here..."
-                        />
-                        {isRecording && (
-                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                <span className="animate-pulse">
-                                    <AlertCircle className="h-5 w-5 text-primary" />
-                                </span>
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="flex flex-wrap gap-4 mb-6">
-                        <Button
-                            onClick={handleStartRecording}
-                            disabled={isRecording}
-                        >
-                            Start Recording
-                        </Button>
-                        <Button
-                            onClick={handleStopRecording}
-                            disabled={!isRecording}
-                        >
-                            Stop Recording
-                        </Button>
-                        <Button
-                            onClick={handleReset}
-                        >
-                            Reset
-                        </Button>
-                    </div>
-
-                    {error && (
-                        <div className="bg-error-light text-error p-3 rounded-md mb-4 flex items-center">
-                            <AlertCircle className="h-5 w-5 mr-2" />
-                            {error}
+                        {/* Input Field */}
+                        <div className="relative">
+                            <Input
+                                ref={inputRef}
+                                type="text"
+                                value={inputText}
+                                onChange={handleInputChange}
+                                onKeyDown={handleKeyDown}
+                                onKeyUp={handleKeyUp}
+                                disabled={!isRecording}
+                                className="w-full"
+                                placeholder="Type the sample text here..."
+                            />
+                            {isRecording && (
+                                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                    <span className="animate-pulse">
+                                        <AlertCircle className="h-5 w-5 text-primary" />
+                                    </span>
+                                </div>
+                            )}
                         </div>
-                    )}
-                </div>
-            </main>
 
-            <footer className="bg-gray-100">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center text-gray-500 text-sm">
-                    © 2024 KeyStroke Biometrics. All rights reserved.
-                </div>
-            </footer>
+                        {/* Control Buttons */}
+                        <div className="flex flex-wrap gap-4">
+                            <Button
+                                onClick={handleStartRecording}
+                                disabled={isRecording}
+                                className="rounded-xl"
+                            >
+                                Start Recording
+                            </Button>
+                            <Button
+                                onClick={handleStopRecording}
+                                disabled={!isRecording}
+                                variant="secondary"
+                                className="rounded-xl"
+                            >
+                                Stop Recording
+                            </Button>
+                            <Button
+                                onClick={handleReset}
+                                variant="destructive"
+                                className="rounded-xl"
+                            >
+                                Reset
+                            </Button>
+                        </div>
+
+                        {/* Error Alert */}
+                        {/* {error && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )} */}
+                    </CardContent>
+                </Card>
+            </main>
         </div>
     )
 }
