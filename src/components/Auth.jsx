@@ -16,11 +16,16 @@ import { calculateMetrics } from '../lib/methods/calculateMetrics.js'
 
 const BASE_URL = import.meta.env.VITE_AUTH_BASE_URL
 const GOOD_SAMPLE_TEXTS = [
-    "the quick brown fox jumps over",        // 26 chars
-    "typing this phrase to verify myself",    // 32 chars
-    "hello world how are you today friend",   // 33 chars
-    "please type this to confirm identity",   // 34 chars
-    "a simple phrase to show my typing style" // 36 chars
+    "jazz waves echo through midnight rain",     // 31 chars
+    "crunchy toast melts golden honey drips",    // 34 chars
+    "bright kites dance against copper clouds",   // 35 chars
+    "spinning dice scatter across velvet",        // 32 chars
+    "fresh mint leaves spark summer dreams",      // 32 chars
+    "crystal peaks shine beyond misty paths",     // 34 chars
+    "robot pandas juggle neon pickles",          // 31 chars
+    "rusty gears whisper ancient secrets",       // 33 chars
+    "purple waves crash digital shores",         // 31 chars
+    "paper boats drift under steel stars"        // 33 chars
 ];
 
 const Auth = () => {
@@ -147,11 +152,17 @@ const Auth = () => {
 
                 console.log("Setting auth data for login:", authData);
                 setAuth(authData);
+                toast({
+                    title: "Pattern Matched",
+                    description: "Character pattern authentication successful!"
+                })
+                navigate('/dashboard')
+            } else {
+                toast({
+                    title: "Pattern Match Failed",
+                    description:  response.data.message || "Failed to authenticate"
+                })
             }
-            toast({
-                title: "Pattern Matched",
-                description: "Character pattern authentication successful!"
-            })
         } catch (error) {
             toast({
                 title: "Error",

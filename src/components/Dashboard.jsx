@@ -6,7 +6,7 @@ import KeystrokesBiometrics from './KeystrokesBiometrics';
 import { Button } from "../components/ui/button"
 import { hydratedAuthAtom } from '../store/store.js';
 import { useAtom } from 'jotai';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 
 const Dashboard = () => {
     const [selectedMenu, setSelectedMenu] = useState('keystroke');
