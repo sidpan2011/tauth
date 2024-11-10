@@ -1,20 +1,34 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from './Header';
 import Footer from './Footer';
-import { Users, Key, Code, Database, Settings, LineChart, Shield, Terminal, ChevronRight, ChevronDown } from 'lucide-react';
+import { Users, Key, Code, Settings, LineChart, Terminal, ChevronRight, ChevronDown, PanelLeftClose, PanelRightClose, Braces } from 'lucide-react';
 import KeystrokesBiometrics from './KeystrokesBiometrics';
 import { Button } from './ui/Button';
+import { hydratedAuthAtom } from '../store/store';
+import { useAtom } from 'jotai';
 
 const Dashboard = () => {
     const [selectedMenu, setSelectedMenu] = useState('keystroke');
     const [openMenus, setOpenMenus] = useState({});
-
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [auth] = useAtom(hydratedAuthAtom)
+    useEffect(() => {
+        console.log("Current auth state in Dashboard:", auth);
+        console.log("User data:", auth?.user?.data);
+        console.log("Is keystroke done:", auth?.user?.data?.is_keystroke_done);
+        console.log("User email:", auth?.user?.data?.email);
+    }, [auth]);
     const toggleSubmenu = (menuId) => {
         setOpenMenus(prev => ({
             ...prev,
             [menuId]: !prev[menuId]
         }));
     };
+    const handleSidebarToggle = () => {
+        document.querySelector('aside').classList.toggle('hidden');
+        setIsSidebarOpen(!isSidebarOpen);
+    }
+    const RANDOM_API_KEY = "AJadsdkjasie73792kkasnasdkakjsd83787487234hshdjfhjshfj"; // Need to change this
 
     return (
         <div className="min-h-screen">
@@ -54,8 +68,6 @@ const Dashboard = () => {
                                     </div>
                                 )}
                             </div>
-
-                            {/* Keystroke Biometrics Section - Simplified */}
                             <div className="text-white">
                                 <Button
                                     variant="doc"
@@ -69,7 +81,6 @@ const Dashboard = () => {
                                 </Button>
                             </div>
 
-                            {/* Developer Section */}
                             <div className="text-white">
                                 <Button
                                     variant="doc"
@@ -88,6 +99,14 @@ const Dashboard = () => {
                                 </Button>
                                 {openMenus.developer && (
                                     <div className="ml-4 mt-2 space-y-2">
+                                        <Button
+                                            variant="doc"
+                                            onClick={() => setSelectedMenu('installation')}
+                                            className="w-full items-center flex justify-start"
+                                        >
+                                            <Braces className="w-4 h-4 mr-2" />
+                                            <span>Installation</span>
+                                        </Button>
                                         <Button
                                             variant="doc"
                                             onClick={() => setSelectedMenu('api')}
@@ -109,27 +128,36 @@ const Dashboard = () => {
                             </div>
                         </nav>
                     </aside>
-
-                    {/* Main Content Area - No slate background */}
+                    {isSidebarOpen ? <PanelLeftClose color='white' size={24} className='cursor-pointer' onClick={handleSidebarToggle} /> : <PanelRightClose color='white' size={24} className='cursor-pointer' onClick={handleSidebarToggle} />}
                     <div className="flex-1 rounded-lg p-6 min-h-screen">
                         <div className="mb-6">
                             <h1 className="text-2xl font-bold text-white">
                                 {selectedMenu === 'keystroke' && 'Keystroke Biometrics Dashboard'}
                                 {selectedMenu === 'api' && 'API Keys Management'}
-                                {selectedMenu === 'settings' && 'Profile Settings'}
+                                {selectedMenu === 'settings' && (
+                                    <div className="flex flex-col gap-2">
+                                        <h1>Profile Settings</h1>
+                                        <div className='flex items-center'>
+                                            <p className='text-sm font-medium'>Your email:</p>
+                                            <p className='text-sm pl-2 font-medium'>{auth.user?.data.email}</p>
+                                        </div>
+                                    </div>
+                                )}
                                 {selectedMenu === 'docs' && 'Developer Documentation'}
+                                {selectedMenu === 'installation' && 'Installation Guide'}
                             </h1>
                         </div>
-
-                        {/* Render content based on selection */}
                         <div className="text-white">
-                            {selectedMenu === 'keystroke' && <KeystrokesBiometrics />}
+                            {selectedMenu === 'keystroke' && (!auth.user?.data?.is_keystroke_done ? <KeystrokesBiometrics /> : <div>
+                                <p className="text-lg">You have already completed the keystroke biometrics setup.</p>
+                            </div>)}
+
                             {selectedMenu === 'api' && (
                                 <div className="space-y-4">
                                     <div className="p-4 border rounded-lg">
                                         <h3 className="font-semibold mb-2">Production API Key</h3>
                                         <div className="flex items-center gap-2">
-                                            <code className="bg-slate-900 w-full px-3 py-2 rounded-xl">AJadsdkjasie73792kkasnasdkakjsd83787487234hshdjfhjshfj</code>
+                                            <code className="bg-slate-900 w-full px-3 py-2 rounded-xl">{RANDOM_API_KEY}</code>
                                             <Button size="sm" className="rounded-xl ">
                                                 Copy
                                             </Button>

@@ -13,11 +13,18 @@ const isSessionExpired = (timestamp) => {
 // Create atom with storage and session management
 export const authAtom = atomWithStorage('auth', {
     isAuthenticated: false,
-    user: null,
+    user: {
+        data: {
+            email: null,
+            is_keystroke_done: false,
+            id: null,
+            created_at: null
+        }
+    },
     sessionStart: null
 });
 
-// Hydrated atom with session management
+// Hydrated atom with session management and proper type checking
 export const hydratedAuthAtom = atom(
     (get) => {
         const authState = get(authAtom);
@@ -27,7 +34,14 @@ export const hydratedAuthAtom = atom(
             // Session expired - clear the state
             return {
                 isAuthenticated: false,
-                user: null,
+                user: {
+                    data: {
+                        email: null,
+                        is_keystroke_done: false,
+                        id: null,
+                        created_at: null
+                    }
+                },
                 sessionStart: null
             };
         }
@@ -35,21 +49,39 @@ export const hydratedAuthAtom = atom(
         return authState;
     },
     (get, set, newValue) => {
-        set(authAtom, {
+        // Ensure the user data structure is correct
+        const sanitizedValue = {
             ...newValue,
+            user: {
+                data: {
+                    email: newValue.user?.data?.email || null,
+                    is_keystroke_done: newValue.user?.data?.is_keystroke_done || false,
+                    id: newValue.user?.data?.id || null,
+                    created_at: newValue.user?.data?.created_at || null
+                }
+            },
             sessionStart: newValue.isAuthenticated ? new Date().getTime() : null
-        });
+        };
+        
+        set(authAtom, sanitizedValue);
     }
 );
 
-// Session check atom
+// Session check atom with proper data structure
 export const sessionCheckAtom = atom(null, (get, set) => {
     const authState = get(authAtom);
     
     if (authState.isAuthenticated && isSessionExpired(authState.sessionStart)) {
         set(authAtom, {
             isAuthenticated: false,
-            user: null,
+            user: {
+                data: {
+                    email: null,
+                    is_keystroke_done: false,
+                    id: null,
+                    created_at: null
+                }
+            },
             sessionStart: null
         });
         return false;

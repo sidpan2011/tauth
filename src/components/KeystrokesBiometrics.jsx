@@ -1,10 +1,16 @@
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useMemo } from 'react'
 import { AlertCircle } from 'lucide-react'
 import { Button } from './ui/button'
 import { calculateMetrics } from '../lib/methods/calculateMetrics'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { Input } from './ui/input'
+import platform from 'platform'
+import axios from 'axios'
+import { hydratedAuthAtom } from '../store/store'
+import { useAtom } from 'jotai'
+
+const BASE_URL = import.meta.env.VITE_AUTH_BASE_URL
 
 export default function KeystrokeBiometrics() {
     const [inputText, setInputText] = useState('')
@@ -12,6 +18,7 @@ export default function KeystrokeBiometrics() {
     const [error, setError] = useState('')
     const [keystrokeData, setKeystrokeData] = useState([])
     const inputRef = useRef(null)
+    const [auth] = useAtom(hydratedAuthAtom)
     const GOOD_SAMPLE_TEXTS = [
         "the quick brown fox jumps over",        // 26 chars
         "typing this phrase to verify myself",    // 32 chars
@@ -19,9 +26,28 @@ export default function KeystrokeBiometrics() {
         "please type this to confirm identity",   // 34 chars
         "a simple phrase to show my typing style" // 36 chars
     ];
-    const sampleText = GOOD_SAMPLE_TEXTS[Math.floor(Math.random() * GOOD_SAMPLE_TEXTS.length)]
+    const sampleText = useMemo(() => {
+        return GOOD_SAMPLE_TEXTS[Math.floor(Math.random() * GOOD_SAMPLE_TEXTS.length)]
+    }, []) 
     console.log(sampleText);
-
+    const renderSampleText = () => {
+        return sampleText.split('').map((char, index) => {
+            const isMatched = index < inputText.length && char === inputText[index];
+            const isWrong = index < inputText.length && char !== inputText[index];
+            return (
+                <span
+                    key={index}
+                    className={`${
+                        isMatched ? 'text-white/40' : 
+                        isWrong ? 'text-red-500' : 
+                        'text-muted-foreground'
+                    } font-bold`}
+                >
+                    {char}
+                </span>
+            );
+        });
+    };
     const handleStartRecording = () => {
         setIsRecording(true)
         setInputText('')
@@ -31,22 +57,39 @@ export default function KeystrokeBiometrics() {
             inputRef.current.focus()
         }
     }
-    const handleStopRecording = () => {
+    const handleStopRecording = async () => {
         setIsRecording(false)
+        console.log(BASE_URL);
         const metrics = calculateMetrics(keystrokeData)
-        const dataForBackend = {
-            sampleText,
-            inputText,
-            keystrokeData,
-            metrics,
-            metaData: {
-                recordingStartedAt: keystrokeData[0]?.time || null,
-                recordingEndedAt: new Date().getTime(),
-                totalKeystrokes: keystrokeData.length,
-                textLength: sampleText.length,
-            }
-        }
-        console.log(dataForBackend);
+        const startTime = keystrokeData[0]?.time || 0
+        const endTime = keystrokeData[keystrokeData.length - 1]?.time || 0
+        const totalTimeInMs = endTime - startTime
+        // const dataForBackend = 
+        const response = await axios.post(`${BASE_URL}/metrics`, {
+            data: {
+                userPID: auth.user?.data?.id,
+                sampleText,
+                inputText,
+                // keystrokeData,
+                metrics,
+                metaData: {
+                    recordingStartedAt: keystrokeData[0]?.time || null,
+                    recordingEndedAt: new Date().getTime(),
+                    totalKeystrokes: keystrokeData.length,
+                    textLength: sampleText.length,
+                    totalTimeInMs,
+                },
+                deviceInfo: {
+                    browser: platform.name || "Unknown",
+                    version: platform.version || "Unknown",
+                    os: platform.os?.family || "Unknown",
+                    osVersion: platform.os?.version || "Unknown",
+                    device_type: platform.product || "Unknown",
+                    screen_resolution: `${window.screen.width}x${window.screen.height}`,
+                }
+            },
+        })
+        console.log(response);
     }
     const handleKeyUp = (e) => {
         if (isRecording) {
@@ -80,8 +123,6 @@ export default function KeystrokeBiometrics() {
         if (isRecording) {
             let newVal = e.target.value;
             setInputText(newVal);
-
-            // More comprehensive checking
             if (newVal.length >= sampleText.length) {
                 if (newVal === sampleText) {
                     // Delay to ensure last keystroke is captured
@@ -104,7 +145,7 @@ export default function KeystrokeBiometrics() {
                     </CardHeader>
                     <CardContent className="space-y-6">
                         {/* Sample Text */}
-                        <p className="text-muted-foreground font-bold">"{sampleText}"</p>
+                        <p className="text-muted-foreground font-bold">"{renderSampleText()}"</p>
 
                         {/* Input Field */}
                         <div className="relative">

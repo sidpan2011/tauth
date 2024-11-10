@@ -1,5 +1,8 @@
-import React, { useState } from 'react'
+import React, { useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import platform from 'platform'
+import { useAtom } from 'jotai'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card'
 import { toast } from '../hooks/use-toast'
 import { Separator } from './ui/separator'
@@ -8,10 +11,8 @@ import { Label } from './ui/label'
 import { Input } from './ui/input'
 import { Button } from './ui/button'
 import { emailSchema, passwordSchema } from '../lib/schemas'
-import axios from 'axios'
-import { AlertCircle, CheckCircle2 } from 'lucide-react'
-import { useAtom } from 'jotai'
 import { hydratedAuthAtom } from '../store/store'
+import { calculateMetrics } from '../lib/methods/calculateMetrics'
 
 const BASE_URL = import.meta.env.VITE_AUTH_BASE_URL
 const GOOD_SAMPLE_TEXTS = [
@@ -21,9 +22,6 @@ const GOOD_SAMPLE_TEXTS = [
     "please type this to confirm identity",   // 34 chars
     "a simple phrase to show my typing style" // 36 chars
 ];
-const sampleText = GOOD_SAMPLE_TEXTS[Math.floor(Math.random() * GOOD_SAMPLE_TEXTS.length)]
-console.log(sampleText);
-console.log(BASE_URL);
 
 const Auth = () => {
     const navigate = useNavigate()
@@ -34,15 +32,137 @@ const Auth = () => {
         characters: ''
     })
     const [isSignIn, setIsSignIn] = useState(true)
+    const [inputText, setInputText] = useState('')
     const [isLoading, setIsLoading] = useState(false)
+    const [keystrokeData, setKeystrokeData] = useState([])
+    const inputRef = useRef(null)
+    const sampleText = useMemo(() => {
+        return GOOD_SAMPLE_TEXTS[Math.floor(Math.random() * GOOD_SAMPLE_TEXTS.length)]
+    }, [])
+    const renderSampleText = () => {
+        return sampleText.split('').map((char, index) => {
+            const isMatched = index < inputText.length && char === inputText[index];
+            const isWrong = index < inputText.length && char !== inputText[index];
+            return (
+                <span
+                    key={index}
+                    className={`${isMatched ? 'text-white/40' :
+                        isWrong ? 'text-red-500' :
+                            'text-muted-foreground'
+                        } font-bold`}
+                >
+                    {char}
+                </span>
+            );
+        });
+    };
+    const handleKeyDown = (e) => {
+        if (e.target.id === 'characters') {
+            setKeystrokeData(prevData => [...prevData, {
+                eventType: "keydown",
+                key: e.key,
+                time: new Date().getTime(),
+                code: e.code,
+                position: e.target.selectionStart,  // Get cursor position here
+            }])
+        }
+    }
+    const handleKeyUp = (e) => {
+        if (e.target.id === 'characters') {
+            setKeystrokeData(prevData => [...prevData, {
+                eventType: "keyup",
+                key: e.key,
+                time: new Date().getTime(),
+                code: e.code,
+                position: e.target.selectionStart,
+            }])
+        }
+    }
+    const typingDataObject = (metrics) => {
+        const startTime = keystrokeData[0]?.time || 0
+        const endTime = keystrokeData[keystrokeData.length - 1]?.time || 0
+        const totalTimeInMs = endTime - startTime
+
+        return {
+            email: formData.email,
+            typing_dna: {
+                metrics: metrics.rawMetrics,
+                wpm: metrics.wpm,
+                totalEvents: metrics.totalEvents,
+                uniqueKeys: metrics.uniqueKeys,
+                metaData: {
+                    recordingStartedAt: keystrokeData[0]?.time || null,
+                    recordingEndedAt: new Date().getTime(),
+                    totalKeystrokes: keystrokeData.length,
+                    textLength: sampleText.length,
+                    totalTimeInMs,
+                    sampleText,
+                    inputText: formData.characters,
+                },
+                deviceInfo: {
+                    browser: platform.name || "Unknown",
+                    version: platform.version || "Unknown",
+                    os: platform.os?.family || "Unknown",
+                    osVersion: platform.os?.version || "Unknown",
+                    device_type: platform.product || "Unknown",
+                    screen_resolution: `${window.screen.width}x${window.screen.height}`,
+                }
+            },
+            password: formData.password || ""
+        }
+    }
+    const handleReset = () => {
+        setInputText('')
+        setKeystrokeData([])
+    }
+    const sendKeystrokeMetrics = async (metrics) => {
+        try {
+            const formattedData = typingDataObject(metrics)
+            console.log("formattedData", formattedData);
+            const response = await axios.post(`${BASE_URL}/login`, formattedData)
+            console.log(response);
+            if (response.data.status_code === 200) {
+                const userData = response.data.data;
+                const authData = {
+                    isAuthenticated: true,
+                    user: {
+                        data: {
+                            email: userData.email,
+                            is_keystroke_done: userData.is_keystroke_done,
+                            id: userData.id,
+                            created_at: userData.created_at
+                        }
+                    },
+                    sessionStart: new Date().getTime()
+                };
+
+                console.log("Setting auth data for login:", authData);
+                setAuth(authData);
+            }
+            toast({
+                title: "Pattern Matched",
+                description: "Character pattern authentication successful!"
+            })
+        } catch (error) {
+            toast({
+                title: "Error",
+                variant: "destructive",
+                description: "An unexpected error occurred",
+            })
+            console.error("Error sending keystroke metrics:", error)
+        }
+    }
     const handleInputChange = (e) => {
         const { id, value } = e.target
         setFormData(prev => ({
             ...prev,
             [id]: value
         }))
-    }
+        if (id === 'characters') {
 
+            setInputText(e.target.value)
+        }
+    }
     const toggleAuth = () => {
         setIsSignIn(!isSignIn)
         setFormData({ email: '', password: '', characters: '' })
@@ -57,7 +177,6 @@ const Auth = () => {
             const emailResult = emailSchema.safeParse(formData.email)
             if (!emailResult.success) {
                 toast({
-                    icon: <AlertCircle className="h-5 w-5 text-red-500" />,
                     title: "Invalid Email",
                     description: emailResult.error.errors[0].message,
                     variant: "destructive"
@@ -80,14 +199,26 @@ const Auth = () => {
                         });
 
                         if (response.data.status_code === 200) {
+                            console.log("Raw login response:", response.data);
+
+                            const userData = response.data.data;
                             const authData = {
                                 isAuthenticated: true,
-                                user: response.data.user,
-                                sessionStart: new Date().getTime() // Add session start time
+                                user: {
+                                    data: {
+                                        email: userData.email,
+                                        is_keystroke_done: userData.is_keystroke_done,
+                                        id: userData.id,
+                                        created_at: userData.created_at
+                                    }
+                                },
+                                sessionStart: new Date().getTime()
                             };
-                            setAuth(authData)
+
+                            console.log("Setting auth data for login:", authData);
+                            setAuth(authData);
+                            console.log("keystroke done value", response.data.is_keystroke_done);
                             toast({
-                                icon: <CheckCircle2 className="h-5 w-5 text-green-500" />,
                                 title: "Sign In Successful",
                                 description: "Welcome back!"
                             })
@@ -96,20 +227,22 @@ const Auth = () => {
                         }
                     } catch (error) {
                         toast({
-                            icon: <AlertCircle className="h-5 w-5 text-red-500" />,
                             title: "Sign In Failed",
                             description: error.response?.data?.message || "Invalid credentials",
                             variant: "destructive"
                         })
                     }
                 } else if (formData.characters === sampleText) {
+                    const metrics = calculateMetrics(keystrokeData)
+                    await sendKeystrokeMetrics(metrics)
                     // For now, just show success toast for character matching
-                    toast({
-                        icon: <CheckCircle2 className="h-5 w-5 text-green-500" />,
-                        title: "Pattern Matched",
-                        description: "Character pattern authentication successful!"
-                    })
+                    // toast({
+                    //     icon: <CheckCircle2 className="h-5 w-5 text-green-500" />,
+                    //     title: "Pattern Matched",
+                    //     description: "Character pattern authentication successful!"
+                    // })
                     setFormData({ email: '', password: '', characters: '' })
+                    setKeystrokeData([])
                 }
             } else {
                 // Handle sign up
@@ -117,7 +250,6 @@ const Auth = () => {
                 console.log("else block for sign up");
                 if (!passwordResult.success) {
                     toast({
-                        icon: <AlertCircle className="h-5 w-5 text-red-500" />,
                         title: "Invalid Password",
                         description: passwordResult.error.errors[0].message,
                         variant: "destructive"
@@ -141,12 +273,12 @@ const Auth = () => {
                     if (response.data.status_code === 200) {
                         const authData = {
                             isAuthenticated: true,
-                            user: response.data.user,
+                            user: response.data,
                             sessionStart: new Date().getTime() // Add session start time
                         };
                         setAuth(authData)
+                        console.log(authData);
                         toast({
-                            icon: <CheckCircle2 className="h-5 w-5 text-green-500" />,
                             title: "Account Created",
                             description: `Account successfully created with ${formData.email}`
                         })
@@ -217,7 +349,7 @@ const Auth = () => {
 
                             {isSignIn ? (
                                 <>
-                                    <div className='space-y-2'>
+                                    <div className='space-y-3'>
                                         <Label>Choose your authentication method</Label>
                                         <Input
                                             type="password"
@@ -237,16 +369,29 @@ const Auth = () => {
                                             </div>
                                         </div>
 
-                                        <div className='space-y-2'>
-                                            <p className='text-sm text-neutral-400'>Type <span className='font-bold text-white'>"{sampleText}"</span> to authenticate</p>
-                                            <Input
-                                                type="text"
-                                                id="characters"
-                                                placeholder="Enter the characters"
-                                                value={formData.characters}
-                                                onChange={handleInputChange}
-                                                disabled={isLoading || formData.password.length > 0}
-                                            />
+                                        <div className='space-y-3'>
+                                            <p className='text-sm text-neutral-400'>Type <span className='font-bold text-white'>"{renderSampleText()}"</span> to authenticate</p>
+
+                                            <div className="flex w-full max-w-sm items-center space-x-2">
+                                                <Input
+                                                    ref={inputRef}
+                                                    type="text"
+                                                    id="characters"
+                                                    placeholder="Enter the characters"
+                                                    value={formData.characters}
+                                                    onChange={handleInputChange}
+                                                    onKeyDown={handleKeyDown}
+                                                    onKeyUp={handleKeyUp}
+                                                    disabled={isLoading || formData.password.length > 0}
+                                                />
+                                                <Button
+                                                    type="button"
+                                                    onClick={handleReset}
+                                                    variant="destructive"
+                                                >
+                                                    Reset
+                                                </Button>
+                                            </div>
                                         </div>
                                     </div>
                                 </>
@@ -280,11 +425,11 @@ const Auth = () => {
                             <Link to="/" className="block">
                                 <Button
                                     type="button"
-                                    variant="destructive"
+                                    variant="outline"
                                     className='w-full font-medium'
                                     disabled={isLoading}
                                 >
-                                    Cancel
+                                    Go back
                                 </Button>
                             </Link>
                         </div>

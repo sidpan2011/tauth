@@ -18,6 +18,7 @@ const Header = () => {
     const handleLogout = () => {
         localStorage.removeItem('auth')
         navigate('/')
+        window.location.reload()
     }
     return (
         <header className='flex justify-between items-center py-4 sticky top-0 backdrop-blur-md bg-background/60 z-20'>
