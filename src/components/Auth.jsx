@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import platform from 'platform'
@@ -44,6 +44,21 @@ const Auth = () => {
     const sampleText = useMemo(() => {
         return GOOD_SAMPLE_TEXTS[Math.floor(Math.random() * GOOD_SAMPLE_TEXTS.length)]
     }, [])
+    useEffect(() => {
+        // Cleanup function to reset states when component unmounts
+        return () => {
+            setFormData({
+                email: '',
+                password: '',
+                characters: ''
+            });
+            setKeystrokeData([]);
+            setInputText('');
+            setIsLoading(false);
+        }
+    }, []);
+
+
     const renderSampleText = () => {
         return sampleText.split('').map((char, index) => {
             const isMatched = index < inputText.length && char === inputText[index];
@@ -87,11 +102,11 @@ const Auth = () => {
         if (!metrics || !keystrokeData.length) {
             throw new Error('Invalid metrics or keystroke data');
         }
-    
+
         const startTime = keystrokeData[0]?.time || Date.now();
         const endTime = keystrokeData[keystrokeData.length - 1]?.time || Date.now();
         const totalTimeInMs = Math.max(0, endTime - startTime);
-    
+
         return {
             email: formData.email,
             typing_dna: {
@@ -160,7 +175,7 @@ const Auth = () => {
             } else {
                 toast({
                     title: "Pattern Match Failed",
-                    description:  response.data.message || "Failed to authenticate"
+                    description: response.data.message || "Failed to authenticate"
                 })
             }
         } catch (error) {
@@ -317,27 +332,41 @@ const Auth = () => {
                         })
                     }
                 } catch (error) {
-                    console.log(error);
+                    // Reset password on signup error
+                    setFormData(prev => ({
+                        ...prev,
+                        password: ''
+                    }));
+                    setIsLoading(false);
+
                     toast({
                         title: "Sign Up Failed",
                         description: error.response?.data?.message || "Failed to create account",
                         variant: "destructive"
                     })
+                    return;
                 }
             }
         } catch (error) {
-            // Reset states on error
+            // Global error handler
+            console.error("Global error:", error);
+
+            // Reset all states
             handleReset();
             setFormData(prev => ({
-                    ...prev,
-                    characters: ''
+                email: prev.email, // Keep email for convenience
+                password: '',
+                characters: ''
             }));
+            setIsLoading(false);
+
             toast({
                 title: "Error",
                 variant: "destructive",
-                description: error.response?.data?.message || "An unexpected error occurred",
+                description: "Something went wrong. Please try again.",
             })
-            console.error("Error sending keystroke metrics:", error)
+        } finally {
+            setIsLoading(false)
         }
     }
 
