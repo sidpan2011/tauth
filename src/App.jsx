@@ -15,16 +15,16 @@ const Pricing = lazy(() => import("./components/Pricing"))
 const Auth = lazy(() => import("./components/Auth"))
 const Dashboard = lazy(() => import("./components/Dashboard"))
 
-// const ProtectedRoute = ({ element }) => {
-//   const [auth] = useAtom(hydratedAuthAtom)
-//   const navigate = useNavigate()
-//   useEffect(() => {
-//     if (!auth.isAuthenticated) {
-//       navigate('/getting-started/auth')
-//     }
-//   }, [auth.isAuthenticated, navigate])
-//   return auth.isAuthenticated ? element : navigate('/')
-// }
+const ProtectedRoute = ({ element }) => {
+  const [auth] = useAtom(hydratedAuthAtom)
+  const navigate = useNavigate()
+  useEffect(() => {
+    if (!auth.isAuthenticated) {
+      navigate('/getting-started/auth')
+    }
+  }, [auth.isAuthenticated, navigate])
+  return auth.isAuthenticated ? element : navigate('/')
+}
 
 
 function App() {
@@ -38,8 +38,8 @@ function App() {
             <Route path='/docs' element={<Docs />} />
             <Route path='/pricing' element={<Pricing />} />
             <Route path='/getting-started/auth' element={<Auth />} />
-            {/* <Route path='/dashboard' element={<ProtectedRoute element={<Dashboard />} />} /> */}
-            <Route path='/dashboard' element={<Dashboard />} />
+            <Route path='/dashboard' element={<ProtectedRoute element={<Dashboard />} />} />
+            {/* <Route path='/dashboard' element={<Dashboard />} /> */}
           </Routes>
           <Toaster />
         </BrowserRouter>
