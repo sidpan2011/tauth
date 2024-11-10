@@ -304,6 +304,17 @@ const Auth = () => {
                         })
                         navigate('/dashboard')
                         setFormData({ email: '', password: '', characters: '' })
+                    } else {
+                        // Reset states on error
+                        handleReset();
+                        setFormData(prev => ({
+                            ...prev,
+                            characters: ''
+                        }));
+                        toast({
+                            title: "Pattern Match Failed",
+                            description: response.data.message || "Failed to authenticate"
+                        })
                     }
                 } catch (error) {
                     console.log(error);
@@ -315,17 +326,18 @@ const Auth = () => {
                 }
             }
         } catch (error) {
+            // Reset states on error
+            handleReset();
+            setFormData(prev => ({
+                    ...prev,
+                    characters: ''
+            }));
             toast({
                 title: "Error",
-                description: "An unexpected error occurred",
+                variant: "destructive",
+                description: error.response?.data?.message || "An unexpected error occurred",
             })
-            console.error("Signup Error:", {
-                message: error.message,
-                response: error.response?.data,
-                status: error.response?.status
-            })
-        } finally {
-            setIsLoading(false)
+            console.error("Error sending keystroke metrics:", error)
         }
     }
 
