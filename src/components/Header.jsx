@@ -2,7 +2,7 @@ import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAtom } from 'jotai'
 import Logo from './Logo'
-import { Button } from "@/components/ui/button"
+import { Button } from "../components/ui/button"
 import { RainbowButtonDemo } from './ReuseableRainbowButton.jsx'
 import { hydratedAuthAtom } from '../store/store.js'
 

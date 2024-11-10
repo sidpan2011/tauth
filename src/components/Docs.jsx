@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import Header from './Header';
 import Footer from './Footer';
-import { Button } from '@/components/ui/button';
+import { Button } from '../components/ui/button';
 import { ChevronRight, ChevronDown, Cpu, Rocket, Code, BookOpen } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Card, CardContent } from '../components/ui/card';
+import { ScrollArea } from '../components/ui/scroll-area';
 
 const Docs = () => {
-  const [activeSection, setActiveSection] = useState('getting-started');
+  const [activeSection, setActiveSection] = useState('introduction');
   const [openMenus, setOpenMenus] = useState({
     'getting-started': true,
   });

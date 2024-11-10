@@ -3,13 +3,13 @@ import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import platform from 'platform'
 import { useAtom } from 'jotai'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card'
 import { toast } from '../hooks/use-toast'
-import { Separator } from '@/components/ui/separator'
+import { Separator } from '../components/ui/separator'
 import Logo from './Logo'
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
-import { Button } from "@/components/ui/button"
+import { Label } from '../components/ui/label'
+import { Input } from '../components/ui/input'
+import { Button } from "../components/ui/button"
 import { emailSchema, passwordSchema } from '../lib/schemas'
 import { hydratedAuthAtom } from '../store/store.js'
 import { calculateMetrics } from '../lib/methods/calculateMetrics.js'
@@ -79,20 +79,29 @@ const Auth = () => {
         }
     }
     const typingDataObject = (metrics) => {
-        const startTime = keystrokeData[0]?.time || 0
-        const endTime = keystrokeData[keystrokeData.length - 1]?.time || 0
-        const totalTimeInMs = endTime - startTime
-
+        if (!metrics || !keystrokeData.length) {
+            throw new Error('Invalid metrics or keystroke data');
+        }
+    
+        const startTime = keystrokeData[0]?.time || Date.now();
+        const endTime = keystrokeData[keystrokeData.length - 1]?.time || Date.now();
+        const totalTimeInMs = Math.max(0, endTime - startTime);
+    
         return {
             email: formData.email,
             typing_dna: {
-                metrics: metrics.rawMetrics,
-                wpm: metrics.wpm,
-                totalEvents: metrics.totalEvents,
-                uniqueKeys: metrics.uniqueKeys,
+                metrics: {
+                    dwellTimes: metrics.rawMetrics?.dwellTimes || [],
+                    flightTimes: metrics.rawMetrics?.flightTimes || [],
+                    upToUpTimes: metrics.rawMetrics?.upToUpTimes || [],
+                    downToDownTimes: metrics.rawMetrics?.downToDownTimes || []
+                },
+                wpm: metrics.wpm || 0,
+                totalEvents: metrics.totalEvents || 0,
+                uniqueKeys: metrics.uniqueKeys || 0,
                 metaData: {
-                    recordingStartedAt: keystrokeData[0]?.time || null,
-                    recordingEndedAt: new Date().getTime(),
+                    recordingStartedAt: startTime,
+                    recordingEndedAt: endTime,
                     totalKeystrokes: keystrokeData.length,
                     textLength: sampleText.length,
                     totalTimeInMs,

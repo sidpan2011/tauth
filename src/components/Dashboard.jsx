@@ -3,7 +3,7 @@ import Header from './Header';
 import Footer from './Footer';
 import { Users, Key, Code, Settings, LineChart, Terminal, ChevronRight, ChevronDown, PanelLeftClose, PanelRightClose, Braces } from 'lucide-react';
 import KeystrokesBiometrics from './KeystrokesBiometrics';
-import { Button } from "@/components/ui/button"
+import { Button } from "../components/ui/button"
 import { hydratedAuthAtom } from '../store/store.js';
 import { useAtom } from 'jotai';
 

@@ -4,7 +4,7 @@ import axios from 'axios'
 import { useAtom } from 'jotai'
 import platform from 'platform'
 import { AlertCircle } from 'lucide-react'
-import { Button } from "@/components/ui/button"
+import { Button } from "../components/ui/button"
 import { calculateMetrics } from '../lib/methods/calculateMetrics.js'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card.jsx'
 import { Input } from './ui/input.jsx'
