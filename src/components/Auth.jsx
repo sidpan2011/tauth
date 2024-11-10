@@ -403,6 +403,7 @@ const Auth = () => {
                                                     onKeyDown={handleKeyDown}
                                                     onKeyUp={handleKeyUp}
                                                     disabled={isLoading || formData.password.length > 0}
+                                                    autoComplete="off"
                                                 />
                                                 <Button
                                                     type="button"
