@@ -1,7 +1,7 @@
 
 import { ThemeProvider } from './components/theme-provider'
 import { Suspense, lazy, useEffect, useState } from 'react'
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { Spinner } from './components/Spinner'
 import { Toaster } from './components/ui/toaster'
 import SessionManager from './components/SessionManeger'
@@ -14,27 +14,36 @@ const Pricing = lazy(() => import("./components/Pricing"))
 const Auth = lazy(() => import("./components/Auth"))
 const Dashboard = lazy(() => import("./components/Dashboard"))
 
+// const ProtectedRoute = ({ children }) => {
+//   const [auth] = useAtom(hydratedAuthAtom)
+//   const [isLoading, setIsLoading] = useState(true)
+  
+//   useEffect(() => {
+//     // Small delay to ensure auth state is loaded
+//     const timer = setTimeout(() => {
+//       setIsLoading(false)
+//     }, 100)
+    
+//     return () => clearTimeout(timer)
+//   }, [])
+
+//   if (isLoading) {
+//     return <Spinner />
+//   }
+
+//   if (!auth?.isAuthenticated || !auth?.user) {
+//     return <Navigate to="/getting-started/auth" replace />
+//   }
+
+//   return children
+// }
+
 const ProtectedRoute = ({ children }) => {
   const [auth] = useAtom(hydratedAuthAtom)
-  const [isLoading, setIsLoading] = useState(true)
-  
-  useEffect(() => {
-    // Small delay to ensure auth state is loaded
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 100)
-    
-    return () => clearTimeout(timer)
-  }, [])
-
-  if (isLoading) {
-    return <Spinner />
+  const location = useLocation() 
+  if (!auth.isAuthenticated) {
+    return <Navigate to="/" state={{ from: location }} replace />
   }
-
-  if (!auth?.isAuthenticated) {
-    return <Navigate to="/getting-started/auth" replace />
-  }
-
   return children
 }
 
