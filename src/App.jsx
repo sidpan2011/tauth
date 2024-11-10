@@ -14,7 +14,7 @@ const Pricing = lazy(() => import("./components/Pricing"))
 const Auth = lazy(() => import("./components/Auth"))
 const Dashboard = lazy(() => import("./components/Dashboard"))
 
-const ProtectedRoute = ({ element: Element }) => {
+const ProtectedRoute = ({ children }) => {
   const [auth] = useAtom(hydratedAuthAtom)
   const [isLoading, setIsLoading] = useState(true)
   
@@ -35,7 +35,7 @@ const ProtectedRoute = ({ element: Element }) => {
     return <Navigate to="/getting-started/auth" replace />
   }
 
-  return <Element />
+  return children
 }
 
 function App() {
@@ -49,7 +49,7 @@ function App() {
             <Route path='/docs' element={<Docs />} />
             <Route path='/pricing' element={<Pricing />} />
             <Route path='/getting-started/auth' element={<Auth />} />
-            <Route path='/dashboard' element={<ProtectedRoute element={<Dashboard />} />} />
+            <Route path='/dashboard' element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             {/* <Route path='/dashboard' element={<Dashboard />} /> */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

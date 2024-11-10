@@ -15,6 +15,7 @@ const Dashboard = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [auth] = useAtom(hydratedAuthAtom)
     const [copied, setCopied] = useState(false);
+    const [error, setError] = useState(null);
     const navigate = useNavigate();
     const RANDOM_API_KEY = "RANDOM KEY"; // Need to implement later
     useEffect(() => {
