@@ -3,8 +3,8 @@ import Header from './Header';
 import Footer from './Footer';
 import { Users, Key, Code, Settings, LineChart, Terminal, ChevronRight, ChevronDown, PanelLeftClose, PanelRightClose, Braces } from 'lucide-react';
 import KeystrokesBiometrics from './KeystrokesBiometrics';
-import { Button } from './ui/Button';
-import { hydratedAuthAtom } from '../store/store';
+import { Button } from './ui/Button.jsx';
+import { hydratedAuthAtom } from '../store/store.js';
 import { useAtom } from 'jotai';
 
 const Dashboard = () => {

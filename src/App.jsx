@@ -6,7 +6,7 @@ import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom'
 import { Spinner } from './components/Spinner'
 import { Toaster } from './components/ui/toaster'
 import SessionManager from './components/SessionManeger'
-import { hydratedAuthAtom } from './store/store'
+import { hydratedAuthAtom } from './store/store.js'
 import { useAtom } from 'jotai'
 
 const Homepage = lazy(() => import("./components/Homepage"))

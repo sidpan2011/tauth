@@ -1,4 +1,4 @@
-import cn from "../../lib/utils";
+import cn from "../../lib/utils.js";
 import { Button } from "./button";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
 

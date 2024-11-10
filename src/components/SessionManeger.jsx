@@ -1,8 +1,8 @@
 import { useEffect, useCallback } from 'react'
 import { useAtom } from 'jotai'
 import { useNavigate } from 'react-router-dom'
-import { hydratedAuthAtom, sessionCheckAtom } from '../store/store'
-import { toast } from '../hooks/use-toast'
+import { hydratedAuthAtom, sessionCheckAtom } from '../store/store.js'
+import { toast } from '../hooks/use-toast.js'
 import { AlertCircle } from 'lucide-react'
 
 const SESSION_CHECK_INTERVAL = 1000 * 60; // Check every minute

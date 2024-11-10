@@ -1,14 +1,14 @@
 
 import { useState, useRef, useMemo } from 'react'
-import { AlertCircle } from 'lucide-react'
-import { Button } from './ui/button'
-import { calculateMetrics } from '../lib/methods/calculateMetrics'
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
-import { Input } from './ui/input'
-import platform from 'platform'
 import axios from 'axios'
-import { hydratedAuthAtom } from '../store/store'
 import { useAtom } from 'jotai'
+import platform from 'platform'
+import { AlertCircle } from 'lucide-react'
+import { Button } from './ui/button.jsx'
+import { calculateMetrics } from '../lib/methods/calculateMetrics.js'
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card.jsx'
+import { Input } from './ui/input.jsx'
+import { hydratedAuthAtom } from '../store/store.js'
 
 const BASE_URL = import.meta.env.VITE_AUTH_BASE_URL
 

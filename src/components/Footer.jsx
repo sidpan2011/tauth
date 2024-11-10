@@ -4,7 +4,7 @@ import { FaXTwitter } from "react-icons/fa6";
 import { FaDiscord } from "react-icons/fa";
 
 import Logo from './Logo'
-import { Button } from './ui/button'
+import { Button } from './ui/button.jsx'
 
 const Footer = () => {
     return (

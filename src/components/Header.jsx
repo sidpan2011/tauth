@@ -1,10 +1,10 @@
 import React from 'react'
-import Logo from './Logo'
-import { Button } from './ui/button'
-import { RainbowButtonDemo } from './ReuseableRainbowButton'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAtom } from 'jotai'
-import { hydratedAuthAtom } from '../store/store'
+import Logo from './Logo'
+import { Button } from './ui/button.jsx'
+import { RainbowButtonDemo } from './ReuseableRainbowButton.jsx'
+import { hydratedAuthAtom } from '../store/store.js'
 
 
 const Header = () => {

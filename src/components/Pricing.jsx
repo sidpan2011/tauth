@@ -1,11 +1,11 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
+import { Check } from 'lucide-react'
 import Header from './Header'
 import Footer from './Footer'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card'
-import { Button } from './ui/button'
-import { Check } from 'lucide-react'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card.jsx'
+import { Button } from './ui/button.jsx'
 import Title from './Title'
-import { Link } from 'react-router-dom'
 
 const Pricing = () => {
     const tiers = [
