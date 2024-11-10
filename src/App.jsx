@@ -2,7 +2,7 @@
 import { ThemeProvider } from './components/theme-provider'
 
 import { Suspense, lazy, useEffect } from 'react'
-import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import { Spinner } from './components/Spinner'
 import { Toaster } from './components/ui/toaster'
 import SessionManager from './components/SessionManeger'
@@ -15,17 +15,15 @@ const Pricing = lazy(() => import("./components/Pricing"))
 const Auth = lazy(() => import("./components/Auth"))
 const Dashboard = lazy(() => import("./components/Dashboard"))
 
-const ProtectedRoute = ({ element }) => {
+const ProtectedRoute = ({ element: Element }) => {
   const [auth] = useAtom(hydratedAuthAtom)
-  const navigate = useNavigate()
-  useEffect(() => {
-    if (!auth.isAuthenticated) {
-      navigate('/getting-started/auth')
-    }
-  }, [auth.isAuthenticated, navigate])
-  return auth.isAuthenticated ? element : navigate('/')
-}
+  
+  if (!auth.isAuthenticated) {
+    return <Navigate to="/getting-started/auth" replace />
+  }
 
+  return <Element />
+}
 
 function App() {
   return (
@@ -40,6 +38,7 @@ function App() {
             <Route path='/getting-started/auth' element={<Auth />} />
             <Route path='/dashboard' element={<ProtectedRoute element={<Dashboard />} />} />
             {/* <Route path='/dashboard' element={<Dashboard />} /> */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           <Toaster />
         </BrowserRouter>
