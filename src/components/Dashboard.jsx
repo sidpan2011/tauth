@@ -7,6 +7,7 @@ import { Button } from "../components/ui/button"
 import { hydratedAuthAtom } from '../store/store.js';
 import { useAtom } from 'jotai';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
     const [selectedMenu, setSelectedMenu] = useState('keystroke');
@@ -14,13 +15,23 @@ const Dashboard = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [auth] = useAtom(hydratedAuthAtom)
     const [copied, setCopied] = useState(false);
+    const navigate = useNavigate();
     const RANDOM_API_KEY = "RANDOM KEY"; // Need to implement later
     useEffect(() => {
-        console.log("Current auth state in Dashboard:", auth);
-        console.log("User data:", auth?.user?.data);
-        console.log("Is keystroke done:", auth?.user?.data?.is_keystroke_done);
-        console.log("User email:", auth?.user?.data?.email);
-    }, [auth]);
+        try {
+            if (!auth?.isAuthenticated) {
+                navigate('/getting-started/auth')
+                return
+            }
+            
+            if (!auth?.user?.data) {
+                throw new Error('User data not found')
+            }
+        } catch (err) {
+            setError(err)
+            console.error('Dashboard error:', err)
+        }
+    }, [auth, navigate])
     const toggleSubmenu = (menuId) => {
         setOpenMenus(prev => ({
             ...prev,
@@ -38,7 +49,21 @@ const Dashboard = () => {
             setCopied(false);
         }, 5000);
     }
-
+    if (error) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <h1 className="text-2xl text-red-500">Something went wrong</h1>
+                    <Button 
+                        onClick={() => navigate('/getting-started/auth')}
+                        className="mt-4"
+                    >
+                        Back to Login
+                    </Button>
+                </div>
+            </div>
+        )
+    }
     return (
         <div className="min-h-screen">
             <div className="xl:px-44 lg:px-20 md:px-14 px-6">

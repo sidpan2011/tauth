@@ -4,12 +4,12 @@ import { useAtom } from 'jotai'
 import Logo from './Logo'
 import { Button } from "../components/ui/button"
 import { RainbowButtonDemo } from './ReuseableRainbowButton.jsx'
-import { hydratedAuthAtom } from '../store/store.js'
+import { hydratedAuthAtom, initialAuthState } from '../store/store.js'
 
 
 const Header = () => {
     const navigate = useNavigate()
-    const [auth] = useAtom(hydratedAuthAtom)
+    const [auth, setAuth] = useAtom(hydratedAuthAtom)
     console.log(auth.isAuthenticated);
     const menus = [
         { title: "Docs", link: "/docs" },
@@ -19,6 +19,7 @@ const Header = () => {
         localStorage.removeItem('auth')
         navigate('/')
         window.location.reload()
+        setAuth(initialAuthState)
     }
     return (
         <header className='flex justify-between items-center py-4 sticky top-0 backdrop-blur-md bg-background/60 z-20'>

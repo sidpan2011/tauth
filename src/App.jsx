@@ -1,8 +1,7 @@
 
 import { ThemeProvider } from './components/theme-provider'
-
-import { Suspense, lazy, useEffect } from 'react'
-import { BrowserRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom'
+import { Suspense, lazy, useEffect, useState } from 'react'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Spinner } from './components/Spinner'
 import { Toaster } from './components/ui/toaster'
 import SessionManager from './components/SessionManeger'
@@ -17,8 +16,22 @@ const Dashboard = lazy(() => import("./components/Dashboard"))
 
 const ProtectedRoute = ({ element: Element }) => {
   const [auth] = useAtom(hydratedAuthAtom)
+  const [isLoading, setIsLoading] = useState(true)
   
-  if (!auth.isAuthenticated) {
+  useEffect(() => {
+    // Small delay to ensure auth state is loaded
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 100)
+    
+    return () => clearTimeout(timer)
+  }, [])
+
+  if (isLoading) {
+    return <Spinner />
+  }
+
+  if (!auth?.isAuthenticated) {
     return <Navigate to="/getting-started/auth" replace />
   }
 
