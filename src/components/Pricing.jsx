@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { Check } from 'lucide-react'
 import Header from './Header'
 import Footer from './Footer'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card.jsx'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from "@/components/ui/button"
 import Title from './Title'
 

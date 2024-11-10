@@ -1,6 +1,6 @@
 
 import cn from "../lib/utils.js"
-import AnimatedShinyText from "./ui/animated-shiny-text.jsx";
+import AnimatedShinyText from "@components/AnimatedShinyText";
 
 
 export function AnimatedShinyTextDemo({ text }) {

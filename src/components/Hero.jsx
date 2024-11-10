@@ -7,7 +7,7 @@ import { BentoDemo } from './BentoCard.jsx'
 import { RainbowButtonDemo } from './ReuseableRainbowButton.jsx'
 import { Button } from "@/components/ui/button"
 import { AnimatedShinyTextDemo } from './ReuseableShinyText.jsx'
-import { AccordionDemo } from './Accordion.jsx'
+import { AccordionDemo } from '@/components/Accordion.jsx'
 import Title from './Title'
 import { hydratedAuthAtom } from '../store/store.js'
 
