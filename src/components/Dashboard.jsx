@@ -6,12 +6,15 @@ import KeystrokesBiometrics from './KeystrokesBiometrics';
 import { Button } from "../components/ui/button"
 import { hydratedAuthAtom } from '../store/store.js';
 import { useAtom } from 'jotai';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 
 const Dashboard = () => {
     const [selectedMenu, setSelectedMenu] = useState('keystroke');
     const [openMenus, setOpenMenus] = useState({});
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [auth] = useAtom(hydratedAuthAtom)
+    const [copied, setCopied] = useState(false);
+    const RANDOM_API_KEY = "RANDOM KEY"; // Need to implement later
     useEffect(() => {
         console.log("Current auth state in Dashboard:", auth);
         console.log("User data:", auth?.user?.data);
@@ -28,7 +31,13 @@ const Dashboard = () => {
         document.querySelector('aside').classList.toggle('hidden');
         setIsSidebarOpen(!isSidebarOpen);
     }
-    const RANDOM_API_KEY = "AJadsdkjasie73792kkasnasdkakjsd83787487234hshdjfhjshfj"; // Need to change this
+    const handleCopy = () => {
+        navigator.clipboard.writeText(RANDOM_API_KEY);
+        setCopied(true);
+        setTimeout(() => {
+            setCopied(false);
+        }, 5000);
+    }
 
     return (
         <div className="min-h-screen">
@@ -154,15 +163,20 @@ const Dashboard = () => {
 
                             {selectedMenu === 'api' && (
                                 <div className="space-y-4">
-                                    <div className="p-4 border rounded-lg">
-                                        <h3 className="font-semibold mb-2">Production API Key</h3>
-                                        <div className="flex items-center gap-2">
-                                            <code className="bg-slate-900 w-full px-3 py-2 rounded-xl">{RANDOM_API_KEY}</code>
-                                            <Button size="sm" className="rounded-xl ">
-                                                Copy
-                                            </Button>
-                                        </div>
-                                    </div>
+                                    <Card className="flex flex-col">
+                                        <CardHeader>
+                                            <CardTitle>Production API Key</CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="w-full">
+                                            <div className='flex justify-between space-x-3'>
+                                                <code className="bg-[#18181b] w-full px-3 py-2 rounded-xl">{RANDOM_API_KEY}</code>
+                                                <Button size="sm" className="rounded-xl" onClick={handleCopy}>
+                                                    {!copied ? "Copy" : "Copied"}
+                                                </Button>
+                                            </div>
+                                        </CardContent>
+
+                                    </Card>
                                     <Button className=" rounded-xl">
                                         Generate New Key
                                     </Button>
