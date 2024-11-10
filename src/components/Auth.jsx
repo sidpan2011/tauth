@@ -9,10 +9,10 @@ import { Separator } from './ui/separator.jsx'
 import Logo from './Logo'
 import { Label } from './ui/label,jsx'
 import { Input } from './ui/input.jsx'
-import { Button } from './ui/button.jsx'
+import { Button } from "@/components/ui/button"
 import { emailSchema, passwordSchema } from '../lib/schemas'
 import { hydratedAuthAtom } from '../store/store.js'
-import { calculateMetrics } from '../lib/methods/calculateMetrics'
+import { calculateMetrics } from '../lib/methods/calculateMetrics.js'
 
 const BASE_URL = import.meta.env.VITE_AUTH_BASE_URL
 const GOOD_SAMPLE_TEXTS = [

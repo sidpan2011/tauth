@@ -5,7 +5,7 @@ import { ArrowRightIcon } from 'lucide-react'
 import MagicalText from './MagicalText'
 import { BentoDemo } from './BentoCard.jsx'
 import { RainbowButtonDemo } from './ReuseableRainbowButton.jsx'
-import { Button } from './ui/button.jsx'
+import { Button } from "@/components/ui/button"
 import { AnimatedShinyTextDemo } from './ReuseableShinyText.jsx'
 import { AccordionDemo } from './Accordion.jsx'
 import Title from './Title'

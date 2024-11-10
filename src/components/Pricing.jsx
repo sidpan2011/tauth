@@ -4,7 +4,7 @@ import { Check } from 'lucide-react'
 import Header from './Header'
 import Footer from './Footer'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card.jsx'
-import { Button } from './ui/button.jsx'
+import { Button } from "@/components/ui/button"
 import Title from './Title'
 
 const Pricing = () => {
