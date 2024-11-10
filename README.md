@@ -1,8 +1,12 @@
-# React + Vite
+# TAuth - Secure Authentication Through Typing Patterns
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+TAuth adds unbreachable security to any application by analyzing typing patterns. Perfect for securing financial transactions, protecting company dashboards, or replacing traditional 2FA. No passwords to steal, no codes to enter – just type naturally to prove it's really you.
 
-Currently, two official plugins are available:
+## Key Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 🔒 Keystroke pattern authentication
+- ⚡️ Real-time pattern analysis
+- 🎯 High precision timing metrics
+- 🔄 Adaptive pattern matching
+- 🛠 Simple integration (3 lines of code)
+- 🚀 Drop-in UI components
